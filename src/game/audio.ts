@@ -29,19 +29,63 @@ export function setMuted(m: boolean) {
   if (ctx && master) master.gain.setTargetAtTime(m ? 0 : 0.8, ctx.currentTime, 0.05)
 }
 
+let paused = false
+
+/**
+ * Sound pausieren (Pause-Menü) oder fortsetzen. Pausiert wird der ganze
+ * AudioContext – also auch das Raumrauschen – statt nur leiser gestellt.
+ */
+export function setAudioPaused(p: boolean) {
+  paused = p
+  if (!ctx) return
+  if (p) void ctx.suspend()
+  else unlock()
+}
+
 /** Bei der ersten Nutzeraktion aufrufen */
 export function initAudio() {
-  if (ctx) {
-    if (ctx.state === 'suspended') void ctx.resume()
-    return
+  if (!ctx) {
+    const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    if (!AC) return
+    // iOS/iPadOS: Web Audio gilt sonst als „Umgebungsgeräusch“ und bleibt im
+    // Stumm-Modus des iPads still. „playback“ verhält sich wie ein Spiel/Video.
+    const session = (navigator as unknown as { audioSession?: { type: string } }).audioSession
+    if (session) session.type = 'playback'
+    ctx = new AC()
+    master = ctx.createGain()
+    master.gain.value = muted ? 0 : 0.8
+    master.connect(ctx.destination)
+    startAmbience()
   }
-  const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
-  if (!AC) return
-  ctx = new AC()
-  master = ctx.createGain()
-  master.gain.value = muted ? 0 : 0.8
-  master.connect(ctx.destination)
-  startAmbience()
+  unlock()
+}
+
+/**
+ * Startet bzw. setzt den AudioContext fort. Safari auf iPad/iPhone lässt das nur
+ * innerhalb bestimmter Nutzeraktionen zu (Tippen loslassen, Klick, Taste) – nicht
+ * beim ersten Berühren. Ein kurzer stummer Ton im selben Moment „entsperrt“ die Ausgabe.
+ */
+function unlock() {
+  if (!ctx || paused || document.hidden) return
+  if (ctx.state !== 'running') void ctx.resume()
+  const buf = ctx.createBuffer(1, 1, 22050)
+  const src = ctx.createBufferSource()
+  src.buffer = buf
+  src.connect(ctx.destination)
+  src.start(0)
+}
+
+if (typeof window !== 'undefined') {
+  // Jede gültige Nutzeraktion darf den Sound (wieder) freischalten – wichtig für iOS,
+  // wo der erste Versuch beim Berühren des Start-Knopfs noch abgelehnt wird.
+  for (const ev of ['touchend', 'click', 'keydown'])
+    window.addEventListener(ev, () => ctx && ctx.state !== 'running' && unlock(), { passive: true, capture: true })
+  // App im Hintergrund oder Tab gewechselt: Sound anhalten
+  document.addEventListener('visibilitychange', () => {
+    if (!ctx) return
+    if (document.hidden) void ctx.suspend()
+    else unlock()
+  })
 }
 
 /** Leises Raumrauschen (Lüftung) plus tiefes Brummen */
@@ -120,3 +164,6 @@ export function sfx(name: Sfx, delay = 0) {
       break
   }
 }
+
+// Zum Debuggen in der Browser-Konsole (nur im Entwicklungsmodus): __audio() → 'running' | 'suspended' | …
+if (import.meta.env?.DEV) (window as unknown as { __audio: () => string }).__audio = () => ctx?.state ?? 'nicht gestartet'

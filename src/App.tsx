@@ -11,6 +11,7 @@ import { Player } from './scene/Player'
 import { HUD } from './ui/HUD'
 import { Overlay } from './ui/Overlay'
 import { Joystick } from './ui/Joystick'
+import { Menu } from './ui/Menu'
 import { addLook, input, isTouch } from './game/input'
 import { pick } from './game/picking'
 import { useGame } from './game/store'
@@ -22,6 +23,8 @@ export default function App() {
   const touch = useRef<TouchTrack | null>(null)
   const [locked, setLocked] = useState(false)
   const [started, setStarted] = useState(false)
+  // Tablet: Menü wird über den Pause-Knopf geöffnet (Desktop: über Esc, also fehlende Maussperre)
+  const [touchMenu, setTouchMenu] = useState(true)
   // Tablets starten ohne Ambient Occlusion; bei niedriger Bildrate wird automatisch reduziert
   // ?q=high|medium|low in der URL erzwingt eine Stufe (zum Testen)
   const [quality, setQuality] = useState<Quality>(
@@ -29,6 +32,17 @@ export default function App() {
   )
   const overlay = useGame((s) => s.overlay)
   const completed = useGame((s) => s.completed)
+  const menuOpen = !completed && !overlay && (isTouch ? touchMenu : !locked)
+
+  // Menü offen = Pause: Steuerung sperren, Sound anhalten, laufende Eingaben verwerfen
+  useEffect(() => {
+    useGame.getState().setPaused(menuOpen)
+    if (!menuOpen) return
+    input.joy.x = 0
+    input.joy.y = 0
+    input.keys.clear()
+    touch.current = null
+  }, [menuOpen])
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => input.keys.add(e.code)
@@ -57,19 +71,41 @@ export default function App() {
     if ((overlay || completed) && document.pointerLockElement) document.exitPointerLock()
   }, [overlay, completed])
 
-  const lock = () => {
+  // Desktop: nach dem Schließen eines Rätsel-Fensters direkt weiterspielen (statt Pausenmenü)
+  const hadOverlay = useRef(false)
+  useEffect(() => {
+    if (overlay) hadOverlay.current = true
+    else if (hadOverlay.current && !isTouch && started && !completed) {
+      hadOverlay.current = false
+      requestLock()
+    }
+  }, [overlay, started, completed])
+
+  const requestLock = () => {
+    try {
+      const p = wrap.current?.querySelector('canvas')?.requestPointerLock() as unknown as Promise<void> | undefined
+      p?.catch?.(() => {}) // abgelehnt (z. B. zu schnell nach Esc) → Pausenmenü bleibt offen
+    } catch {
+      /* ältere Browser */
+    }
+  }
+
+  const resume = () => {
+    // iOS erlaubt das Fortsetzen des Sounds nur direkt im Tipp-Ereignis –
+    // deshalb die Pause hier sofort aufheben, nicht erst im nächsten Render
+    if (isTouch) useGame.getState().setPaused(false)
     initAudio()
     setStarted(true)
-    if (isTouch) return
-    wrap.current?.querySelector('canvas')?.requestPointerLock()
+    if (isTouch) setTouchMenu(false)
+    else requestLock()
   }
 
   const onPointerDown = (e: React.PointerEvent) => {
     initAudio()
     const st = useGame.getState()
-    if (st.overlay || st.completed) return
+    if (st.overlay || st.completed || st.paused) return
     if (e.pointerType === 'mouse') {
-      if (!document.pointerLockElement) return lock()
+      if (!document.pointerLockElement) return requestLock()
       const id = pick(0, 0)
       if (id) st.interact(id)
       return
@@ -134,33 +170,11 @@ export default function App() {
         </Suspense>
       </Canvas>
 
-      <HUD locked={locked} />
-      {isTouch && started && !overlay && !completed && <Joystick />}
+      <HUD locked={locked} showPause={isTouch && started && !menuOpen && !overlay && !completed} onPause={() => setTouchMenu(true)} />
+      {isTouch && !menuOpen && !overlay && !completed && <Joystick />}
       <Overlay />
+      {menuOpen && <Menu started={started} onResume={resume} />}
 
-      {!completed && !overlay && (isTouch ? !started : !locked) && (
-        <div className="screen" onPointerDown={(e) => { e.stopPropagation(); lock() }}>
-          <div className="card">
-            <h1>Labor 1</h1>
-            <p>Löse alle Aufgaben im Labor, um den Raum zu verlassen.</p>
-            {isTouch ? (
-              <ul>
-                <li>Joystick links: laufen</li>
-                <li>Wischen: umsehen</li>
-                <li>Gegenstand antippen: untersuchen</li>
-              </ul>
-            ) : (
-              <ul>
-                <li>WASD / Pfeiltasten: laufen</li>
-                <li>Maus: umsehen</li>
-                <li>Klick: Gegenstand untersuchen</li>
-                <li>Esc: Pause</li>
-              </ul>
-            )}
-            <button>{started ? 'Weiter' : 'Los geht’s'}</button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

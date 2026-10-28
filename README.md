@@ -24,9 +24,9 @@ Dann im Browser `http://localhost:5173` öffnen.
 | Laufen | WASD / Pfeiltasten | Joystick links unten |
 | Umsehen | Maus (nach Klick ins Bild) | Wischen |
 | Interagieren | Klick auf Gegenstand unter dem Fadenkreuz | Gegenstand antippen |
-| Pause | Esc | – |
+| Pause | Esc | Pause-Knopf oben rechts |
 
-Oben rechts: Inventar, Ton an/aus (🔊) und Fortschritt zurücksetzen (↺). Der Fortschritt wird im Browser gespeichert (`localStorage`).
+Oben rechts: Inventar, Ton an/aus (🔊) und auf Tablets der Pause-Knopf. Im Pausenmenü: Weiter, Ton an/aus und „Neu starten“ (mit Rückfrage). In der Pause sind Steuerung und Sound angehalten; der Sound pausiert auch, wenn der Tab oder die App in den Hintergrund wechselt. Der Fortschritt wird im Browser gespeichert (`localStorage`).
 
 ## Rätselkette im Prototyp
 
@@ -56,7 +56,7 @@ Der Stil wird zentral in `scene/style.ts` gesteuert; alle Bausteine aus `scene/k
 - **Post-Processing:** Ambient Occlusion, Bloom für Bildschirme/LEDs/Lampen, Tone Mapping, Kantenglättung, Vignette
 - **Leben im Raum:** blubbernde Kolben, animierte Monitore, Wanduhr mit echter Zeit, flackernde Röhre, Staub im Licht, Zentrifuge
 - **Texturen:** Boden, Poster, Warnstreifen und Schilder werden per Canvas gezeichnet – keine Bilddateien nötig
-- **Sound:** Raumrauschen, Klicks und Erfolgsklänge per Web Audio API synthetisiert – keine Audiodateien nötig
+- **Sound:** Raumrauschen, Klicks und Erfolgsklänge per Web Audio API synthetisiert – keine Audiodateien nötig. Auf iPad/iPhone wird der Sound beim ersten Tippen freigeschaltet und spielt auch im Stumm-Modus (Audio-Session „playback“, ab iPadOS 16.4).
 - **Feedback:** Anvisierte Gegenstände bekommen einen weißen Umriss; beim Abschluss dreht die Kamera zur Tür, die aufschwingt und Licht hereinlässt
 
 ### Kompakter Raum („Bühnenbild“)
@@ -142,6 +142,7 @@ Im Entwicklungsmodus (`npm run dev`) sind in der Browser-Konsole verfügbar:
 - `__game.getState()` – Spielzustand ansehen, z. B. `__game.getState().interact('tuer')`
 - `__input.yaw = 1.5` – Blickrichtung setzen
 - `__teleport(1.9, -1)` – Spieler an eine Position (x, z) setzen
+- `__audio()` – Zustand des Sounds (`running`, `suspended`, …)
 
 ## Deployment auf Coolify
 
@@ -163,7 +164,7 @@ Das Spiel ist eine rein statische Web-App: Beim Build entsteht ein Ordner mit HT
 6. **Deploy** klicken. Der Healthcheck (`/healthz`) zeigt Coolify, wann der Container bereit ist.
 7. Optional: **Automatic Deployment** aktiv lassen – dann wird bei jedem Push auf `main` neu gebaut.
 
-Umgebungsvariablen sind nicht nötig. Die Debug-Helfer (`__game`, `__input`, `__teleport`) sind im Produktions-Build nicht enthalten.
+Umgebungsvariablen sind nicht nötig. Die Debug-Helfer (`__game`, `__input`, `__teleport`, `__audio`) sind im Produktions-Build nicht enthalten.
 
 **Lokal testen wie auf dem Server** (falls Docker installiert ist):
 

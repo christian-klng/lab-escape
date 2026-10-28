@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { ITEMS, OBJECTS, REQUIRED_IDS, type ItemId } from './config'
-import { sfx } from './audio'
+import { isMuted, setAudioPaused, setMuted, sfx } from './audio'
 
 type GameState = {
   // persistent
@@ -14,6 +14,11 @@ type GameState = {
   overlay: string | null
   message: string | null
   msgKey: number
+  /** Menü offen (Start oder Pause): Steuerung gesperrt, Sound angehalten */
+  paused: boolean
+  muted: boolean
+  /** Zählt bei jedem Neustart hoch – der Spieler wird dann an den Start gesetzt */
+  round: number
 
   setHovered: (id: string | null) => void
   interact: (id: string) => void
@@ -21,6 +26,8 @@ type GameState = {
   closeOverlay: () => void
   say: (text: string | null) => void
   reset: () => void
+  setPaused: (p: boolean) => void
+  toggleMute: () => void
 }
 
 const initial = { solved: {}, toggles: {}, inventory: [] as ItemId[], completed: false }
@@ -33,6 +40,21 @@ export const useGame = create<GameState>()(
       overlay: null,
       message: null,
       msgKey: 0,
+      paused: true,
+      muted: isMuted(),
+      round: 0,
+
+      setPaused: (p) => {
+        if (get().paused === p) return
+        setAudioPaused(p)
+        set({ paused: p })
+      },
+
+      toggleMute: () => {
+        const m = !get().muted
+        setMuted(m)
+        set({ muted: m })
+      },
 
       setHovered: (id) => set({ hovered: id }),
 
@@ -102,7 +124,7 @@ export const useGame = create<GameState>()(
 
       closeOverlay: () => set({ overlay: null }),
 
-      reset: () => set({ ...initial, overlay: null, hovered: null, message: null }),
+      reset: () => set((s) => ({ ...initial, overlay: null, hovered: null, message: null, round: s.round + 1 })),
     }),
     {
       name: 'labor-escape-v1',

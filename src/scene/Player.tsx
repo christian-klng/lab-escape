@@ -25,11 +25,22 @@ export function Player() {
     camera.rotation.order = 'YXZ'
   }, [camera, scene])
 
+  // Neustart: zurück an die Startposition, Blick nach vorn
+  const round = useGame((s) => s.round)
+  useEffect(() => {
+    if (round === 0) return
+    const [x, y, z] = PLAYER_START
+    body.current?.setTranslation({ x, y, z }, true)
+    body.current?.setLinvel({ x: 0, y: 0, z: 0 }, true)
+    input.yaw = 0
+    input.pitch = 0
+  }, [round])
+
   useFrame((_, dt) => {
     const b = body.current
     if (!b) return
     const st = useGame.getState()
-    const blocked = !!st.overlay || st.completed
+    const blocked = !!st.overlay || st.completed || st.paused
 
     let f = 0
     let r = 0

@@ -21,16 +21,19 @@ body {
 .bar { margin-top: 6px; width: 160px; height: 6px; background: #374151; border-radius: 3px; overflow: hidden; }
 .bar > div { height: 100%; background: #22c55e; transition: width 0.4s; }
 
+.topright { position: absolute; top: 16px; right: 16px; display: flex; gap: 8px; align-items: flex-start; }
+.topright button { pointer-events: auto; }
 .inventory {
-  position: absolute; top: 16px; right: 112px; display: flex; gap: 8px;
+  display: flex; gap: 8px;
   background: rgba(17, 24, 39, 0.75); padding: 8px; border-radius: 10px;
 }
 .slot { width: 40px; height: 40px; display: grid; place-items: center; font-size: 22px; background: #374151; border-radius: 8px; }
 .empty { font-size: 13px; color: #9ca3af; padding: 10px 6px; }
 
-.reset {
-  position: absolute; top: 16px; right: 16px; width: 40px; height: 40px;
-  border-radius: 10px; border: none; background: rgba(17, 24, 39, 0.75); color: #f9fafb; font-size: 18px; cursor: pointer;
+.iconbtn {
+  width: 56px; height: 56px; flex: none;
+  border-radius: 10px; border: none; background: rgba(17, 24, 39, 0.75); color: #f9fafb; font-size: 22px; cursor: pointer;
+  display: grid; place-items: center;
 }
 
 .crosshair {
@@ -86,4 +89,6 @@ body {
 }
 .knob { width: 56px; height: 56px; border-radius: 50%; background: rgba(255, 255, 255, 0.55); pointer-events: none; }
 
-.mute { right: 64px; }
+.menu-row { display: flex; gap: 8px; }
+.menu-row button { flex: 1; }
+.card button.danger { background: #b91c1c; }
