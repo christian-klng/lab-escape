@@ -127,7 +127,7 @@ export const useGame = create<GameState>()(
       reset: () => set((s) => ({ ...initial, overlay: null, hovered: null, message: null, round: s.round + 1 })),
     }),
     {
-      name: 'labor-escape-v1',
+      name: 'lab-escape-v1',
       partialize: (s) => ({
         solved: s.solved,
         toggles: s.toggles,

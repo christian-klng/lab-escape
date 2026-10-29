@@ -1,4 +1,4 @@
-# Labor Escape – Prototyp
+# Lab Escape Game – Prototyp
 
 First-Person-Escape-Room im Browser: Ein Labor mit interaktiven Gegenständen (Quiz, Zahlenschloss, Hinweise, Animationen). Wenn alle Pflichtaufgaben gelöst sind, öffnet sich die Ausgangstür.
 
@@ -169,8 +169,8 @@ Umgebungsvariablen sind nicht nötig. Die Debug-Helfer (`__game`, `__input`, `__
 **Lokal testen wie auf dem Server** (falls Docker installiert ist):
 
 ```bash
-docker build -t labor-escape .
-docker run --rm -p 8080:80 labor-escape
+docker build -t lab-escape .
+docker run --rm -p 8080:80 lab-escape
 # dann http://localhost:8080 öffnen
 ```
 

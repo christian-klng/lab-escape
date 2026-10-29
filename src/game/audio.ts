@@ -9,7 +9,7 @@ let muted = readMuted()
 
 function readMuted() {
   try {
-    return localStorage.getItem('labor-muted') === '1'
+    return localStorage.getItem('lab-escape-muted') === '1'
   } catch {
     return false
   }
@@ -22,7 +22,7 @@ export function isMuted() {
 export function setMuted(m: boolean) {
   muted = m
   try {
-    localStorage.setItem('labor-muted', m ? '1' : '0')
+    localStorage.setItem('lab-escape-muted', m ? '1' : '0')
   } catch {
     /* egal */
   }
