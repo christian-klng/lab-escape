@@ -22,15 +22,31 @@ export function Overlay() {
       style={{ pointerEvents: ready ? 'auto' : 'none' }}
       onPointerDown={(e) => e.stopPropagation()}
     >
-      <div className="card">
-        <h2>{o.name}</h2>
-        {o.type === 'quiz' && <Quiz key={id} id={id} />}
-        {o.type === 'code' && <CodeLock key={id} id={id} />}
-        {o.type === 'info' && <Info id={id} />}
-        <button className="secondary" onClick={() => useGame.getState().closeOverlay()}>
-          Schließen
-        </button>
-      </div>
+      {o.type === 'portrait' ? (
+        <div className="card portrait-card">
+          <div className="portrait-frame">
+            <img src={o.image} alt={o.name} width={600} height={800} />
+          </div>
+          <div className="portrait-text">
+            <h2>{o.name}</h2>
+            <span className="portrait-subtitle">{o.subtitle}</span>
+            <p>{o.text}</p>
+            <button className="secondary" onClick={() => useGame.getState().closeOverlay()}>
+              Schließen
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="card">
+          <h2>{o.name}</h2>
+          {o.type === 'quiz' && <Quiz key={id} id={id} />}
+          {o.type === 'code' && <CodeLock key={id} id={id} />}
+          {o.type === 'info' && <Info id={id} />}
+          <button className="secondary" onClick={() => useGame.getState().closeOverlay()}>
+            Schließen
+          </button>
+        </div>
+      )}
     </div>
   )
 }

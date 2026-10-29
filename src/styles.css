@@ -92,3 +92,22 @@ body {
 .menu-row { display: flex; gap: 8px; }
 .menu-row button { flex: 1; }
 .card button.danger { background: #b91c1c; }
+
+/* Porträt-Fenster: Bild im Rahmen links, Text rechts – auf schmalen Bildschirmen untereinander */
+.card.portrait-card {
+  width: min(680px, 100%); display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: center;
+  animation: portrait-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+@keyframes portrait-in { from { opacity: 0; transform: translateY(12px) scale(0.97); } }
+.portrait-frame {
+  background: #f3efe6; padding: 10px; border-radius: 6px;
+  box-shadow: 0 0 0 6px #8a5a3c, 0 14px 30px rgba(0, 0, 0, 0.45);
+  transform: rotate(-2deg);
+}
+.portrait-frame img { display: block; width: 100%; height: auto; border-radius: 2px; }
+.portrait-text { display: flex; flex-direction: column; gap: 10px; }
+.portrait-subtitle { color: #6fb3a3; font-weight: 600; font-size: 14px; margin-top: -6px; }
+@media (max-width: 560px) {
+  .card.portrait-card { grid-template-columns: 1fr; justify-items: center; }
+  .portrait-frame { width: 170px; }
+}

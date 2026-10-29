@@ -153,3 +153,19 @@ export function skyDomeTexture() {
     ctx.fillRect(0, 0, 16, 256)
   })
 }
+
+/** Messingschild mit eingravierter Schrift (z. B. unter dem Porträt) */
+export function plaqueTexture(text: string) {
+  return canvasTex(256, 64, (ctx) => {
+    const g = ctx.createLinearGradient(0, 0, 0, 64)
+    g.addColorStop(0, '#e9c46a')
+    g.addColorStop(1, '#b8892f')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, 256, 64)
+    ctx.fillStyle = '#5b4214'
+    ctx.font = 'bold 30px Georgia, serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(text, 128, 34)
+  })
+}

@@ -1,3 +1,5 @@
+import professorClever from '../assets/professor-clever.webp'
+
 // Raum-Konfiguration: Hier werden alle Gegenstände und Rätsel definiert.
 // Neue Rätsel = neuer Eintrag hier + ein 3D-Objekt in scene/Lab.tsx mit derselben id.
 
@@ -30,6 +32,8 @@ export type Interactable =
   | (Base & { type: 'quiz'; question: string; answers: string[]; correct: number })
   | (Base & { type: 'code'; prompt: string; code: string })
   | (Base & { type: 'info'; text: string })
+  /** Reine Info mit Bild (z. B. Porträt an der Wand) – wird nie „gelöst“ */
+  | (Base & { type: 'portrait'; image: string; subtitle: string; text: string })
   | (Base & { type: 'use' })
   | (Base & { type: 'toggle' })
   | (Base & { type: 'exit' })
@@ -90,6 +94,14 @@ export const ROOM: { id: string; title: string; objects: Interactable[] } = {
       consumes: true,
       lockedText: 'Das Analysegerät wartet auf eine Probe.',
       successText: 'Analyse abgeschlossen: Probe unauffällig ✔',
+    },
+    {
+      id: 'portrait',
+      type: 'portrait',
+      name: 'Professor Clever',
+      image: professorClever,
+      subtitle: 'Gründer dieses Labors',
+      text: 'Professor Clever erforscht seit über dreißig Jahren künstliche Intelligenz und hat dieses Labor gegründet, um Maschinen das Lernen beizubringen. Kaum taucht irgendwo eine neue Technik auf, probiert er sie schon aus – sehr zur Freude seiner Studierenden und manchmal zum Leidwesen der Laborgeräte.',
     },
     {
       id: 'tuer',

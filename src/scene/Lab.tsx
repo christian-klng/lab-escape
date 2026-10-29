@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { ContactShadows, Environment, Lightformer, Sparkles } from '@react-three/drei'
+import { ContactShadows, Environment, Lightformer, Sparkles, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { useGame } from '../game/store'
 import { C, Collider, Cyl, Glow, Hit, RBox, Screen, Solid, damp, type V3 } from './kit'
 import { LOWPOLY, seg } from './style'
-import { exitSignTexture, floorTexture } from './textures'
+import { exitSignTexture, floorTexture, plaqueTexture } from './textures'
+import { OBJECTS } from '../game/config'
 import { Decor } from './Decor'
 import { DOOR_HALF, FX_LAYER, HX, HZ, PROP_SCALE, ROOM, WINDOW } from './layout'
 import { Park } from './Park'
@@ -416,6 +417,36 @@ function Analyzer() {
   )
 }
 
+/** Bilderrahmen mit Porträt an der Rückwand – öffnet beim Anklicken ein Info-Fenster */
+function Portrait() {
+  const id = 'portrait'
+  const o = OBJECTS[id]
+  const image = useTexture(o.type === 'portrait' ? o.image : '')
+  image.colorSpace = THREE.SRGBColorSpace
+  image.anisotropy = 4
+  const plaque = useMemo(() => plaqueTexture('Prof. Clever'), [])
+  // Bild 3:4 (0,33 × 0,44 m), Passepartout und Holzrahmen drumherum
+  return (
+    <Hit id={id} position={[-0.4, 1.62, -HZ + 0.03]}>
+      <RBox id={id} position={[0, 0, 0]} size={[0.47, 0.6, 0.035]} color="#8a5a3c" radius={0.012} roughness={0.7} />
+      <mesh position={[0, 0, 0.019]}>
+        <planeGeometry args={[0.39, 0.51]} />
+        <meshStandardMaterial color={C.cream} roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 0, 0.021]}>
+        <planeGeometry args={[0.33, 0.44]} />
+        <meshStandardMaterial map={image} roughness={0.6} />
+      </mesh>
+      {/* Messingschild */}
+      <RBox position={[0, -0.37, 0.004]} size={[0.22, 0.055, 0.01]} color="#c99a3c" metalness={0.6} roughness={0.35} radius={0.004} />
+      <mesh position={[0, -0.37, 0.0095]}>
+        <planeGeometry args={[0.21, 0.05]} />
+        <meshStandardMaterial map={plaque} metalness={0.4} roughness={0.4} />
+      </mesh>
+    </Hit>
+  )
+}
+
 function ExitDoor() {
   const id = 'tuer'
   const completed = useGame((s) => s.completed)
@@ -472,6 +503,7 @@ export function Lab() {
       <Centrifuge />
       <Analyzer />
       <ExitDoor />
+      <Portrait />
       <Park />
     </>
   )
