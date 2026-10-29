@@ -157,7 +157,7 @@ Das Spiel ist eine rein statische Web-App: Beim Build entsteht ein Ordner mit HT
 **Einrichtung in Coolify:**
 
 1. Repository zu GitHub pushen (siehe unten).
-2. In Coolify: **Projects → (Projekt wählen) → + New → Private Repository (with GitHub App)** bzw. **Public Repository**, dann das Repository `labor-escape` und den Branch `main` wählen.
+2. In Coolify: **Projects → (Projekt wählen) → + New → Private Repository (with GitHub App)** bzw. **Public Repository**, dann das Repository `lab-escape` und den Branch `main` wählen.
 3. **Build Pack:** `Dockerfile` (Base Directory `/`, Dockerfile Location `/Dockerfile`).
 4. **Ports Exposes:** `80`.
 5. **Domains:** gewünschte Domain eintragen, z. B. `https://labor.example.de` – Coolify holt das SSL-Zertifikat automatisch.
@@ -182,11 +182,11 @@ Aktuell nicht. Der Spielfortschritt liegt im Browser (`localStorage`). Eine Date
 
 Das Projekt ist ein Git-Repository mit Branch `main`. Zum ersten Push:
 
-1. Auf GitHub ein **leeres** Repository `labor-escape` anlegen (ohne README, `.gitignore` oder Lizenz).
+1. Auf GitHub ein **leeres** Repository `lab-escape` anlegen (ohne README, `.gitignore` oder Lizenz).
 2. Im Projektordner:
 
 ```bash
-git remote add origin https://github.com/<dein-account>/labor-escape.git
+git remote add origin https://github.com/<dein-account>/lab-escape.git
 git push -u origin main
 ```
 
