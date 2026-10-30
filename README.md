@@ -35,9 +35,25 @@ Oben rechts: Inventar, Ton an/aus (🔊) und auf Tablets der Pause-Knopf. Im Pau
 3. **Schublade** (Sideboard hinten) – Zettel mit Code
 4. **Verschlossene Box** (orange, auf dem Tisch) – Code 4711 → Zugangskarte 💳
 5. **Analysegerät** (rechte Wand) – Probe einlegen
-6. **Ausgangstür** – mit Zugangskarte, wenn alles erledigt ist → Raum abgeschlossen
+6. **Sprachmaschine** (vorne links neben der Tür) – statistisches Sprachmodell ausprobieren, danach Abschlussfrage (siehe unten)
+7. **Ausgangstür** – mit Zugangskarte, wenn alles erledigt ist → Raum abgeschlossen
 
 Die **Zentrifuge** ist ein reines Animationsobjekt (an/aus), ohne Einfluss auf den Abschluss.
+
+### Sprachmaschine: statistische Sprachmodelle
+
+Eine ältere Dampfmaschine im Steampunk-Stil (Kessel, Hydraulikzylinder mit wippendem Balancier, Zahnräder, zwei Manometer, Dampf). Beim Anklicken öffnet sich das Fenster „Statistische Sprachmodelle“:
+
+1. **Text laden:** eigene Datei hochladen (`.txt` oder `.docx`) oder den Beispieltext nutzen. Die Maschine zählt, welches Wort wie oft auf die vorherigen Wörter folgt (n-Gramme für n = 1 … 5).
+2. **Ausprobieren:** Satzanfang eingeben, mit dem Regler n wählen (Standard: n = 1, also nur Worthäufigkeit ohne Kontext; n = 5 sagt das nächste Wort aus den 4 vorherigen voraus) und auf **Senden** klicken. Die Maschine vervollständigt den Satz. Über den Info-Knopf (i) in der Ausgabe lässt sich eine kurze Erklärung zum gewählten n einblenden mit echten Zahlen aus dem Text (welche Wörter wie oft folgten, wie oft es nur eine einzige Möglichkeit gab).
+3. **Aufgabe:** Mit jedem n einmal senden. Danach erscheint die Frage, wofür solche Modelle in der Praxis genutzt werden (richtig: Wortvorschläge beim Tippen). Falsche Antworten werden rot markiert, man kann beliebig oft probieren; die richtige Antwort schließt die Aufgabe ab.
+
+Details:
+
+- **Modell** (`src/game/ngram.ts`): Wörter und Satzzeichen werden getrennt gezählt, Groß-/Kleinschreibung nur für die Anzeige beibehalten. Das nächste Wort wird nach Häufigkeit gewürfelt, bis ein Satzende kommt (höchstens 40 Wörter). Kommt eine Wortfolge im Text nicht vor, schaut das Modell auf weniger Wörter (Backoff). Gelernt werden höchstens 400.000 Wörter.
+- **Word-Dokumente** werden mit [mammoth](https://github.com/mwilliamson/mammoth.js) gelesen; die Bibliothek wird erst geladen, wenn jemand eine `.docx` wählt. Alte `.doc`-Dateien werden nicht unterstützt. Textdateien, die nicht in UTF-8 gespeichert sind, werden als Windows-1252 gelesen.
+- **Beispieltext** (`src/assets/grimm-maerchen.txt`): 52 Märchen der Brüder Grimm aus den *Kinder- und Haus-Märchen*, Band 1, 7. Auflage 1857 (Ausgabe letzter Hand), gemeinfrei, Textquelle [Wikisource](https://de.wikisource.org/wiki/Kinder-_und_Haus-M%C3%A4rchen_Band_1_(1857)); rund 74.000 Wörter, ohne die beiden plattdeutschen Märchen. Der Text wird erst geladen, wenn man ihn auswählt.
+- **Gespeichert** wird nur, mit welchen n schon gesendet wurde – nicht der hochgeladene Text. Solange die Seite offen ist, bleibt das gelernte Modell erhalten.
 
 ## Stilisierte Optik
 
@@ -100,6 +116,7 @@ src/
     audio.ts    ← synthetischer Sound (Ambiente + Effekte)
     input.ts    ← Eingabezustand (Tastatur, Maus, Touch, Joystick)
     picking.ts  ← Raycast: welcher Gegenstand wird angezielt/angetippt
+    ngram.ts    ← statistisches Sprachmodell (n-Gramme, Backoff, Satzgenerierung)
   scene/
     layout.ts   ← Raumgröße, Hero-Prop-Vergrößerung, Blickwinkel, Startposition
     style.ts    ← Stil-Schalter (Low-Poly / weich), Segmentzahlen, Facetten-Shader
@@ -107,12 +124,14 @@ src/
     kit.tsx     ← Bausteine: RBox, Cyl, Mat, Glow, Hit, Screen, Farbpalette
     textures.ts ← prozedurale Texturen (Boden, Poster, Schilder)
     Lab.tsx     ← Raum, Licht und alle interaktiven Gegenstände
+    LanguageEngine.tsx ← Sprachmaschine (Steampunk-Dampfmaschine, animiert)
     Decor.tsx   ← Dekoration (Regal, Fenster, Uhr, Pflanzen, Rohre …)
     Effects.tsx ← Post-Processing je Qualitätsstufe
     Player.tsx  ← Spieler-Kapsel mit Kollision, Kamera, Bewegung
   ui/
     HUD.tsx     ← Fortschritt, Inventar, Fadenkreuz, Meldungen, Endscreen
     Overlay.tsx ← Quiz, Zahlenschloss, Info-Fenster
+    NgramMachine.tsx ← Fenster der Sprachmaschine (Upload, Regler, Ausgabe, Abschlussfrage)
     Joystick.tsx← virtueller Joystick für Touch
 ```
 
@@ -125,6 +144,7 @@ src/
 | `info` | Overlay mit Text (z. B. Hinweis) |
 | `use` | Direkt lösen, wenn `requires` erfüllt ist (z. B. Schlüssel benutzen) |
 | `toggle` | Nur Animation an/aus |
+| `ngram` | Sprachmaschine: Text laden, n-Gramm-Modell für n = 1 … 5 ausprobieren, danach Abschlussfrage |
 | `exit` | Abschluss, wenn alle `required`-Aufgaben gelöst sind |
 
 Gemeinsame Felder: `requires` (benötigte Gegenstände), `reward` (Belohnung), `consumes` (Gegenstand verbrauchen), `required` (zählt für den Abschluss), `lockedText`, `successText`.

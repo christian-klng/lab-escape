@@ -10,6 +10,7 @@ import { OBJECTS } from '../game/config'
 import { Decor } from './Decor'
 import { DOOR_HALF, FX_LAYER, HX, HZ, PROP_SCALE, ROOM, WINDOW } from './layout'
 import { Park } from './Park'
+import { LanguageEngine } from './LanguageEngine'
 
 // ---------- Licht & Atmosphäre ----------
 
@@ -504,6 +505,7 @@ export function Lab() {
       <Analyzer />
       <ExitDoor />
       <Portrait />
+      <LanguageEngine />
       <Park />
     </>
   )

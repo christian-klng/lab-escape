@@ -9,6 +9,8 @@ type GameState = {
   toggles: Record<string, boolean>
   inventory: ItemId[]
   completed: boolean
+  /** Sprachmaschine: mit welchen n schon einmal gesendet wurde */
+  ngramTried: number[]
   // flüchtig
   hovered: string | null
   overlay: string | null
@@ -19,6 +21,10 @@ type GameState = {
   muted: boolean
   /** Zählt bei jedem Neustart hoch – der Spieler wird dann an den Start gesetzt */
   round: number
+  /** Sprachmaschine: zählt bei jeder Verarbeitung hoch – die Kolben pumpen dann kurz */
+  enginePulse: number
+  /** Sprachmaschine: aktuell eingestelltes n (für den Zeiger am Manometer) */
+  engineN: number
 
   setHovered: (id: string | null) => void
   interact: (id: string) => void
@@ -28,9 +34,12 @@ type GameState = {
   reset: () => void
   setPaused: (p: boolean) => void
   toggleMute: () => void
+  pulseEngine: () => void
+  setEngineN: (n: number) => void
+  markNgram: (n: number) => void
 }
 
-const initial = { solved: {}, toggles: {}, inventory: [] as ItemId[], completed: false }
+const initial = { solved: {}, toggles: {}, inventory: [] as ItemId[], completed: false, ngramTried: [] as number[] }
 
 export const useGame = create<GameState>()(
   persist(
@@ -43,6 +52,8 @@ export const useGame = create<GameState>()(
       paused: true,
       muted: isMuted(),
       round: 0,
+      enginePulse: 0,
+      engineN: 1,
 
       setPaused: (p) => {
         if (get().paused === p) return
@@ -55,6 +66,10 @@ export const useGame = create<GameState>()(
         setMuted(m)
         set({ muted: m })
       },
+
+      pulseEngine: () => set((s) => ({ enginePulse: s.enginePulse + 1 })),
+      setEngineN: (n) => set({ engineN: n }),
+      markNgram: (n) => set((s) => (s.ngramTried.includes(n) ? {} : { ngramTried: [...s.ngramTried, n] })),
 
       setHovered: (id) => set({ hovered: id }),
 
@@ -89,7 +104,8 @@ export const useGame = create<GameState>()(
           return
         }
 
-        if (s.solved[id] && o.type !== 'info') {
+        // Info und Sprachmaschine lassen sich auch nach dem Lösen wieder öffnen
+        if (s.solved[id] && o.type !== 'info' && o.type !== 'ngram') {
           sfx('click')
           return s.say(`${o.name}: bereits erledigt.`)
         }
@@ -103,7 +119,7 @@ export const useGame = create<GameState>()(
 
         if (o.type === 'use') return get().solve(id)
 
-        // quiz, code, info öffnen ein Overlay
+        // quiz, code, info, ngram öffnen ein Overlay
         sfx('click')
         set({ overlay: id })
       },
@@ -133,6 +149,7 @@ export const useGame = create<GameState>()(
         toggles: s.toggles,
         inventory: s.inventory,
         completed: s.completed,
+        ngramTried: s.ngramTried,
       }),
     },
   ),

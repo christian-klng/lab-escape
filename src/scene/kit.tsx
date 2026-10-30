@@ -29,6 +29,11 @@ export const C = {
   green: '#4cc38a',
   steel: '#c5cdd2',
   door: '#4d7f95',
+  // Sprachmaschine (Steampunk)
+  brass: '#c9a44c',
+  brassDark: '#9a7a32',
+  copper: '#b8693d',
+  iron: '#3d3936',
 }
 
 export function useHovered(id?: string) {

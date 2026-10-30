@@ -169,3 +169,41 @@ export function plaqueTexture(text: string) {
     ctx.fillText(text, 128, 34)
   })
 }
+
+/** Zifferblatt für ein Manometer: vergilbtes Papier, Skala über 270°, rote Zone am Ende */
+export function gaugeTexture(labels: string[], caption: string) {
+  return canvasTex(256, 256, (ctx) => {
+    const c = 128
+    const g = ctx.createRadialGradient(c, c, 20, c, c, 128)
+    g.addColorStop(0, '#f6ecd2')
+    g.addColorStop(1, '#dcc89a')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, 256, 256)
+    const a0 = Math.PI * 0.75
+    const span = Math.PI * 1.5
+    // rote Zone
+    ctx.strokeStyle = '#b8402c'
+    ctx.lineWidth = 14
+    ctx.beginPath()
+    ctx.arc(c, c, 96, a0 + span * 0.8, a0 + span)
+    ctx.stroke()
+    ctx.strokeStyle = '#3b2a14'
+    ctx.fillStyle = '#3b2a14'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.font = 'bold 30px Georgia, serif'
+    const steps = (labels.length - 1) * 4
+    for (let i = 0; i <= steps; i++) {
+      const a = a0 + (span * i) / steps
+      const major = i % 4 === 0
+      ctx.lineWidth = major ? 5 : 2
+      ctx.beginPath()
+      ctx.moveTo(c + Math.cos(a) * (major ? 82 : 90), c + Math.sin(a) * (major ? 82 : 90))
+      ctx.lineTo(c + Math.cos(a) * 104, c + Math.sin(a) * 104)
+      ctx.stroke()
+      if (major) ctx.fillText(labels[i / 4], c + Math.cos(a) * 60, c + Math.sin(a) * 60)
+    }
+    ctx.font = 'italic 22px Georgia, serif'
+    ctx.fillText(caption, c, c + 70)
+  })
+}

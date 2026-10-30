@@ -111,3 +111,83 @@ body {
   .card.portrait-card { grid-template-columns: 1fr; justify-items: center; }
   .portrait-frame { width: 170px; }
 }
+
+/* Sprachmaschine: Steampunk-Fenster – dunkles Holz, Messing, Nieten, Papier */
+.card.steam-card {
+  width: min(640px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto;
+  background:
+    radial-gradient(circle at 14px 14px, #e2c070 0 4px, transparent 5px),
+    radial-gradient(circle at calc(100% - 14px) 14px, #e2c070 0 4px, transparent 5px),
+    radial-gradient(circle at 14px calc(100% - 14px), #e2c070 0 4px, transparent 5px),
+    radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), #e2c070 0 4px, transparent 5px),
+    linear-gradient(160deg, #3a2a1e, #24180f);
+  border: 3px solid #b8903f; box-shadow: 0 0 0 2px #5a4220, 0 20px 50px rgba(0, 0, 0, 0.5);
+  color: #f1e6cc; font-family: Georgia, 'Times New Roman', serif;
+  animation: portrait-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.steam-card p { color: #e3d6b8; }
+.steam-card strong { color: #f3d58a; }
+.steam-head { text-align: center; border-bottom: 1px solid #6b5129; padding-bottom: 10px; }
+.steam-kicker { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #c9a44c; }
+.steam-head h2 { color: #f3d58a; font-size: 26px; font-weight: normal; text-shadow: 0 2px 0 #000; }
+.steam-card button {
+  font-family: inherit; background: linear-gradient(#e2c070, #b38a35); color: #2b1d0e;
+  box-shadow: inset 0 1px 0 #f7e2a8, 0 2px 0 #5a4220;
+}
+.steam-card button.secondary { background: #4a3826; color: #f1e6cc; box-shadow: inset 0 1px 0 #6b5236; }
+.steam-card button.wrong { background: #a3281b; color: #fff; box-shadow: none; }
+.steam-card .answers button { background: #4a3826; color: #f1e6cc; box-shadow: inset 0 1px 0 #6b5236; }
+.steam-card .answers button.wrong { background: #a3281b; }
+.steam-card button.link { background: none; box-shadow: none; color: #e2c070; padding: 4px 6px; min-height: 0; text-decoration: underline; }
+.steam-card button.chip { min-height: 32px; padding: 4px 10px; font-size: 13px; border-radius: 999px; background: #4a3826; color: #e3d6b8; box-shadow: none; }
+.steam-choice { display: flex; flex-direction: column; gap: 8px; }
+.steam-note { font-size: 13px; color: #b9a77f !important; }
+.steam-done { background: #23422e; border: 1px solid #4cc38a; padding: 8px 12px; border-radius: 8px; color: #c8f2d8 !important; }
+.steam-loading { display: flex; flex-direction: column; gap: 8px; }
+.steam-bar { height: 12px; border-radius: 6px; background: #1a110a; border: 1px solid #6b5129; overflow: hidden; }
+.steam-bar > div { height: 100%; background: linear-gradient(90deg, #b8693d, #e2c070); transition: width 0.15s; }
+.steam-source { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; color: #e3d6b8; }
+.steam-slider { display: flex; flex-direction: column; gap: 4px; }
+.steam-slider em { margin-left: 10px; font-size: 14px; color: #c9b58a; }
+.steam-slider input { width: 100%; accent-color: #c9a44c; height: 28px; }
+.steam-ticks { display: flex; justify-content: space-between; font-size: 12px; color: #b9a77f; padding: 0 4px; }
+.steam-prompt { display: flex; gap: 8px; }
+.steam-prompt input {
+  flex: 1; min-width: 0; font: inherit; font-size: 16px; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid #6b5129; background: #f3ead2; color: #2b1d0e;
+  user-select: text; -webkit-user-select: text;
+}
+.steam-suggest { display: flex; gap: 6px; flex-wrap: wrap; margin-top: -4px; }
+.steam-tape {
+  background: repeating-linear-gradient(90deg, transparent 0 22px, rgba(60, 40, 15, 0.12) 22px 24px), #efe4c8;
+  color: #2b1d0e; padding: 14px 16px; border-radius: 4px; line-height: 1.6; font-size: 17px;
+  border-top: 6px dotted #c9b78f; border-bottom: 6px dotted #c9b78f;
+  user-select: text; -webkit-user-select: text;
+}
+.steam-tape { position: relative; padding-right: 48px; }
+.steam-tape .gen { color: #8b2c12; font-weight: bold; }
+/* Info-Knopf am Lochstreifen und Tooltip mit der Erklärung */
+.steam-card button.steam-info {
+  position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; min-height: 0; padding: 0;
+  border-radius: 50%; font-style: italic; font-size: 17px; line-height: 32px; user-select: none;
+}
+.steam-card button.steam-info.open { background: #4a3826; color: #f3d58a; box-shadow: inset 0 1px 0 #6b5236; }
+.steam-tip {
+  position: absolute; top: 46px; right: 6px; z-index: 2; width: min(380px, calc(100% - 12px));
+  display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 10px;
+  background: #2b1e13; border: 2px solid #b8903f; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+  font-size: 14px; font-weight: normal; line-height: 1.5; text-align: left;
+  animation: pop-tip 0.18s ease-out;
+}
+.steam-tip::before {
+  content: ''; position: absolute; top: -8px; right: 12px; width: 12px; height: 12px;
+  background: #2b1e13; border-left: 2px solid #b8903f; border-top: 2px solid #b8903f; transform: rotate(45deg);
+}
+@keyframes pop-tip { from { opacity: 0; transform: translateY(-4px); } }
+.steam-valves { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; font-size: 12px; }
+.steam-valves span {
+  padding: 4px 8px; border-radius: 999px; border: 1px solid #6b5129; color: #b9a77f; background: #2b1e13;
+}
+.steam-valves span.on { background: #e2c070; color: #2b1d0e; border-color: #e2c070; box-shadow: 0 0 10px rgba(226, 192, 112, 0.6); }
+.steam-valves em { font-size: 13px; color: #c9b58a; margin-left: 4px; }
+.steam-quiz { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #6b5129; padding-top: 12px; }

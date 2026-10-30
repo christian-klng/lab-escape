@@ -1,7 +1,7 @@
 // Synthetischer Sound per Web Audio API – ganz ohne Audiodateien.
 // Der AudioContext darf erst nach einer Nutzeraktion starten (Browser-Regel).
 
-export type Sfx = 'click' | 'key' | 'error' | 'success' | 'pickup' | 'open' | 'complete'
+export type Sfx = 'click' | 'key' | 'error' | 'success' | 'pickup' | 'open' | 'complete' | 'steam' | 'piston'
 
 let ctx: AudioContext | null = null
 let master: GainNode | null = null
@@ -134,6 +134,27 @@ function tone(freq: number, start: number, dur: number, type: OscillatorType, vo
   o.stop(start + dur + 0.05)
 }
 
+/** Gefiltertes Rauschen, z. B. für Dampf */
+function hiss(start: number, dur: number, freq: number, vol: number) {
+  if (!ctx || !master) return
+  const len = Math.ceil(ctx.sampleRate * dur)
+  const buf = ctx.createBuffer(1, len, ctx.sampleRate)
+  const data = buf.getChannelData(0)
+  for (let i = 0; i < len; i++) data[i] = Math.random() * 2 - 1
+  const src = ctx.createBufferSource()
+  src.buffer = buf
+  const bp = ctx.createBiquadFilter()
+  bp.type = 'bandpass'
+  bp.frequency.value = freq
+  bp.Q.value = 0.8
+  const g = ctx.createGain()
+  g.gain.setValueAtTime(0.0001, start)
+  g.gain.exponentialRampToValueAtTime(vol, start + 0.04)
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur)
+  src.connect(bp).connect(g).connect(master)
+  src.start(start)
+}
+
 export function sfx(name: Sfx, delay = 0) {
   if (!ctx || !master) return
   const t = ctx.currentTime + delay
@@ -158,6 +179,16 @@ export function sfx(name: Sfx, delay = 0) {
       break
     case 'open':
       tone(240, t, 0.35, 'triangle', 0.12, 90)
+      break
+    case 'steam':
+      hiss(t, 0.9, 3200, 0.16)
+      break
+    case 'piston':
+      // drei schwere Kolbenschläge mit kurzem Zischen
+      for (let i = 0; i < 3; i++) {
+        tone(95, t + i * 0.22, 0.14, 'triangle', 0.2, 55)
+        hiss(t + i * 0.22 + 0.05, 0.16, 1800, 0.05)
+      }
       break
     case 'complete':
       ;[523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.13, 0.5, 'triangle', 0.16))

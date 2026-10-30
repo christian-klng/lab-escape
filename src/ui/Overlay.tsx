@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { OBJECTS } from '../game/config'
 import { useGame } from '../game/store'
 import { sfx } from '../game/audio'
+import { NgramMachine } from './NgramMachine'
 
 export function Overlay() {
   const id = useGame((s) => s.overlay)
@@ -22,7 +23,9 @@ export function Overlay() {
       style={{ pointerEvents: ready ? 'auto' : 'none' }}
       onPointerDown={(e) => e.stopPropagation()}
     >
-      {o.type === 'portrait' ? (
+      {o.type === 'ngram' ? (
+        <NgramMachine key={id} id={id} />
+      ) : o.type === 'portrait' ? (
         <div className="card portrait-card">
           <div className="portrait-frame">
             <img src={o.image} alt={o.name} width={600} height={800} />

@@ -34,6 +34,8 @@ export type Interactable =
   | (Base & { type: 'info'; text: string })
   /** Reine Info mit Bild (z. B. Porträt an der Wand) – wird nie „gelöst“ */
   | (Base & { type: 'portrait'; image: string; subtitle: string; text: string })
+  /** Sprachmaschine: n-Gramm-Modell für n = 1 … 5 ausprobieren, danach Abschlussfrage */
+  | (Base & { type: 'ngram'; title: string; question: string; answers: string[]; correct: number })
   | (Base & { type: 'use' })
   | (Base & { type: 'toggle' })
   | (Base & { type: 'exit' })
@@ -102,6 +104,22 @@ export const ROOM: { id: string; title: string; objects: Interactable[] } = {
       image: professorClever,
       subtitle: 'Gründer dieses Labors',
       text: 'Professor Clever erforscht seit über dreißig Jahren künstliche Intelligenz und hat dieses Labor gegründet, um Maschinen das Lernen beizubringen. Kaum taucht irgendwo eine neue Technik auf, probiert er sie schon aus – sehr zur Freude seiner Studierenden und manchmal zum Leidwesen der Laborgeräte.',
+    },
+    {
+      id: 'sprachmaschine',
+      type: 'ngram',
+      name: 'Sprachmaschine',
+      required: true,
+      title: 'Statistische Sprachmodelle',
+      question: 'Wofür werden solche statistischen Sprachmodelle in der Praxis eingesetzt?',
+      answers: [
+        'Gesichter auf Fotos erkennen',
+        'Wortvorschläge beim Tippen auf dem Smartphone',
+        'Lange Gespräche führen und Fragen mit Weltwissen beantworten wie ein moderner KI-Chatbot',
+        'Das Wetter für die nächste Woche vorhersagen',
+      ],
+      correct: 1,
+      successText: 'Richtig! Die Sprachmaschine zischt zufrieden. ✔',
     },
     {
       id: 'tuer',
